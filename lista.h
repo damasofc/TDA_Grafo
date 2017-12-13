@@ -21,10 +21,10 @@ class lista
 private:
     nodo<T>* inicio;
     nodo<T>* fin;
-    int cantElementos;
     
     
 public:
+    int cantElementos;
     lista()
     {
         inicio = NULL;
@@ -144,7 +144,7 @@ public:
             temp->siguiente = nuevo;
             return 0;
         }
-        this->cantElementos++;
+        cantElementos++;
     }
     T get(int pos)
     {

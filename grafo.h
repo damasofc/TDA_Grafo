@@ -17,7 +17,7 @@ public:
     lista<Nodo*>* nodos;
     Grafo(bool isDirigido)
     {
-        nodos = new lista<Nodo*>;
+        nodos = new lista<Nodo*>();
         dirigido = isDirigido;
     }
     bool estaNodo(Nodo* val)
@@ -160,24 +160,25 @@ public:
         }
         return false;
     }
-    Grafo* unir(Grafo* graf)
+    void unir(Grafo* graf)
     {
-        Grafo* nuevo = new Grafo(graf->dirigido);
         for(int i = 0; i < graf->nodos->size(); i++)
         {
             Nodo* act = graf->nodos->get(i);
             Nodo* nuev = new Nodo(act->name);
-            nuev->aristas = act->aristas->clonar();
-            nuevo->agregarNodo(nuev);
+
+            
+            this->agregarNodo(nuev);
         }
-        for(int i = 0; i < this->nodos->size(); i++)
+        for(int i = 0; i < graf->nodos->size(); i++)
         {
-            Nodo* act = this->nodos->get(i);
-            Nodo* nuev = new Nodo(act->name);
-            nuev->aristas = act->aristas->clonar();
-            nuevo->agregarNodo(nuev);
+            Nodo* act = graf->nodos->get(i);
+            for(int m = 0; m < act->aristas->size(); m++)
+            {
+                Arista* curr = act->aristas->get(m);
+                this->agregarArista(new Arista(curr->origen,curr->destino,curr->peso));
+            }
         }
-        return nuevo;
     }
     Arista* obtenerArista(Nodo* ori, Nodo* des)
     {

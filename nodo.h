@@ -15,7 +15,7 @@ public:
     string name;
     Nodo(string nombre)
     {
-        aristas = new lista<Arista*>;
+        aristas = new lista<Arista*>();
         this->name = nombre;
     }
     bool operator==(Nodo* nodo)

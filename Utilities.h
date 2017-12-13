@@ -29,6 +29,28 @@ public:
         }
         return regreso;
     }
+    static Nodo* nodoDistMinima(Nodo* origen,lista<Nodo*>* vertices)
+    {
+        lista<Arista*>* aristasHijas = origen->aristas;
+        int distanciaMin = 40000;
+        Nodo* regreso = origen;
+        Nodo* ori;
+        Nodo* destino;
+        for(int i = 0; i < aristasHijas->size(); i++)
+        {
+            Arista* current = aristasHijas->get(i);
+            ori = current->origen;
+            destino = current->destino;
+            int posOri = vertices->buscar(ori);
+            int posDest = vertices->buscar(destino);
+            if( current->peso < distanciaMin)
+            {
+                distanciaMin = current->peso;
+                regreso = destino;
+            }
+        }
+        return regreso;
+    }
     static Grafo* dijkstra(Grafo* graf,Nodo* origen)
     {
         Grafo* nuevoGrafo = new Grafo(graf->dirigido);
@@ -295,6 +317,7 @@ public:
     }
     static lista<Arista*>* sortMenorMayor(Grafo* graf)
     {
+        int cant = 0;
         lista<Arista*>* aristas = new lista<Arista*>();
         for(int i = 0; i < graf->nodos->size() ; i++)
         {
@@ -308,6 +331,7 @@ public:
                     if(aristas->size() == 0)
                     {
                         aristas->push_front(current);
+                        cant++;
                     }
                     else
                     {
@@ -315,91 +339,86 @@ public:
                         for(int s = 0; s < aristas->size(); s++)
                         {
                             Arista* temp = aristas->get(s);
-                            if(current == temp)
-                                continue;
+                            //if(current == temp)
+                               // continue;
                             if(current->peso <= temp->peso)
                             {
                                 aristas->insertar(current,s);
+                                cant++;
                                 insertado = true;
                                 break;
                             }
                         }
                         if(!insertado)
+                        {
                             aristas->push_back(current);
+                            cant++;
+
+                        }
                         
                     }
                 }
             }
             
         }
+        aristas->cantElementos = cant;
         return aristas;
         
     }
-    static bool estaNodo(Nodo* nodo,Grafo* graf)
+    static Nodo* Find(Nodo* no,Nodo* padre[],lista<Nodo*>* vertices)
     {
-        lista<Arista*>* aristas = new lista<Arista*>();
-        for(int i = 0; i < graf->nodos->size(); i++)
+        if( no == padre[ vertices->buscar(no) ] )
+        {   
+            return no;
+        }
+        else return Find( padre[ vertices->buscar(no) ],padre,vertices );
+    }
+    static void Union( Nodo* x , Nodo* y,Nodo* padre[],lista<Nodo*>* vertices )
+    {
+        Nodo* xRoot = Find(x,padre,vertices );    
+        Nodo* yRoot = Find( y,padre,vertices );   
+        padre[vertices->buscar(xRoot)] = yRoot;
+        for(int i = 0; i < vertices->size(); i++)
         {
-            Nodo* act = graf->nodos->get(i);
-            for(int a = 0; a < act->aristas->size(); a++)
-            {
-                Arista* current = act->aristas->get(a);
-                aristas->push_back(current);
-            }
-            
+            if(padre[i] == xRoot)
+                padre[i] = yRoot;
         }
         
-        //comprueba si esta el nodo en este grafo
-        for(int i = 0; i < aristas->size(); i++)
-        {
-            Arista* actual = aristas->get(i);
-            if(actual->origen == nodo || actual->destino == nodo)
-                return true;
-        }
-        return false;
     }
     static Grafo* kruskal(Grafo* graf)
     {
         Grafo* nuevo = new Grafo(graf->dirigido);
         lista<Nodo*>* vertices = graf->nodos->clonar();
-        lista<Grafo*>* arboles = new lista<Grafo*>();
+        Nodo* padre[vertices->size()];
         lista<Arista*>* aristasRegreso = new lista<Arista*>();
         for(int i = 0; i < vertices->size(); i++)
         {
-            arboles->push_back(new Grafo(graf->dirigido));
-            arboles->get(i)->agregarNodo(vertices->get(i));
+            padre[i] = vertices->get(i);
         }
         lista<Arista*>* temp = sortMenorMayor(graf);
+        cout<<"\nARISTAS ORDENADAS:"<<endl;
         for(int i = 0; i < temp->size(); i++)
+        {
+            Arista* actual = temp->get(i);
+            cout<<"\t\t\tEL camino desde: "<<actual->origen->name<<" hasta: "<<actual->destino->name
+                <<" es de peso: "<<actual->peso<<endl;
+        }
+        
+        for(int i = 0;i < temp->size();i++)
         {
             Arista* actual = temp->get(i);
             int posOrigen = vertices->buscar(actual->origen);
             int posDes = vertices->buscar(actual->destino);
-            //chequiar que no se produzca un ciclo
-            if(!estaNodo(actual->origen,arboles->get(posOrigen)) || !estaNodo(actual->destino,arboles->get(posDes)))
+            //if(Find(actual->origen,padre,vertices) != Find(actual->destino,padre,vertices))
+            if(Find(actual->origen,padre,vertices) != Find(actual->destino,padre,vertices))
             {
-                aristasRegreso->push_back(actual);
-                arboles->get(posOrigen)->agregarArista(actual);
-                arboles->get(posDes)->agregarArista(actual);
+                 aristasRegreso->push_back(actual);
+                 Union(actual->origen,actual->destino,padre,vertices);
 
             }
-
-            //comprobar que ya esten todos conectados
-            int cont = 0 ;
-            for(int a = 0; a < vertices->size(); a++)
-            {
-                
-            }
-            //if(cont>=vertices->size())
-            //{
-            //    
-            //}
-            
-            
             
         }
         
-
         //imprimir
         cout<<"\t\tKRUSKAL"<<endl;
         for(int i = 0; i < aristasRegreso->size(); i++)
@@ -407,6 +426,94 @@ public:
             Arista* actual = aristasRegreso->get(i);
             cout<<"\t\t\tEL camino desde: "<<actual->origen->name<<" hasta: "<<actual->destino->name
                 <<" es de peso: "<<actual->peso<<endl;
+        }
+        return nuevo;
+    }
+
+    static Grafo* prim(Grafo* graf)
+    {
+        Grafo* nuevo = new Grafo(graf->dirigido);
+        lista<Nodo*>* vertices = graf->nodos->clonar();
+        Nodo* origen = NULL;
+        for(int i = 0; i < vertices->size(); i++)
+        {
+            if(graf->hijosDe(vertices->get(i))->size()>0)
+            {
+                origen = vertices->get(i);
+                break;
+            }
+        }
+        
+        //inicializacion
+        int posOrigen = vertices->buscar(origen);
+        int visitado[vertices->size()];
+        int pesos[vertices->size()];
+        Arista* padre[vertices->size()];
+        for(int i = 0; i < vertices->size(); i++)
+        {
+            pesos[i] = 1000;
+            visitado[i] = 0;
+            Nodo* at = vertices->get(i);
+            nuevo->agregarNodo(new Nodo(at->name));
+            padre[i] = NULL;
+        }
+        //1 significa true 
+        //0 significa false
+        visitado[posOrigen] = 1;
+        pesos[posOrigen] = 0;
+        //fin inicializacion
+        Nodo* actual = origen;
+        bool continuar = true;
+        while(continuar)
+        {
+            visitado[vertices->buscar(actual)] = 1;
+           
+            for(int m = 0; m < graf->hijosDe(actual)->size(); m++)
+            {
+                Arista* act = graf->hijosDe(actual)->get(m);
+                Nodo* ady = act->destino;
+                int w = act->peso;
+                //REALAJAR
+                int posActual = vertices->buscar(actual);
+                int posAdy = vertices->buscar(ady);
+                if((pesos[posAdy]) > w)
+                {
+                    pesos[posAdy] = w;
+                }
+                if(nodoDistMinima(actual,visitado,vertices) == ady && (visitado[posAdy] == 0))
+                    padre[posAdy] = act;
+                //FIN RELAJAR
+            }
+            //comprobar que todos esten visitados
+            int cont = 0;
+            for(int r = 0; r < vertices->size(); r++)
+            {
+                if(visitado[r] == 1)
+                {
+                    cont++;
+                }
+
+            }
+            if(cont >= vertices->size())
+            {
+                continuar = false;
+            }
+            else
+            {
+                actual = nodoDistMinima(actual,visitado,vertices);
+
+            }
+        }
+        //IMPRIMIR ARISTAS
+        cout<<"\t\tPRIM"<<endl;
+        for(int i = 0; i < vertices->size(); i++)
+        {
+            Arista* actual = padre[i];
+            if(actual == NULL)
+                continue;
+            cout<<"\t\t\tEL camino desde: "<<actual->origen->name<<" hasta: "<<actual->destino->name
+                <<" es de peso: "<<actual->peso<<endl;
+            
         }
         return nuevo;
     }
