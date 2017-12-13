@@ -398,6 +398,7 @@ public:
             padre[i] = vertices->get(i);
         }
         lista<Arista*>* temp = sortMenorMayor(graf);
+
         
         for(int i = 0;i < temp->size();i++)
         {
@@ -463,6 +464,7 @@ public:
         {
             visitado[vertices->buscar(actual)] = 1;
            
+           
             for(int m = 0; m < graf->hijosDe(actual)->size(); m++)
             {
                 Arista* act = graf->hijosDe(actual)->get(m);
@@ -471,14 +473,10 @@ public:
                 //REALAJAR
                 int posActual = vertices->buscar(actual);
                 int posAdy = vertices->buscar(ady);
-                if((pesos[posAdy]) > w)
-                {
-                    pesos[posAdy] = w;
-                }
-                if(nodoDistMinima(actual,visitado,vertices) == ady && (visitado[posAdy] == 0))
+                if((nodoDistMinima(actual,visitado,vertices) == ady) && (pesos[posAdy] > w))
                 {
                     padre[posAdy] = act;
-                    actual = vertices->get(posAdy);
+                    pesos[posAdy] = w;
                     break;
                 }
                     
@@ -500,7 +498,7 @@ public:
             }
             else
             {
-                //actual = nodoDistMinima(actual,visitado,vertices);
+                actual = nodoDistMinima(actual,visitado,vertices);
 
             }
         }

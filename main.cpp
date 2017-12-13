@@ -11,19 +11,13 @@ int main()
     grafo->agregarNodo(new Nodo("b"));
     grafo->agregarNodo(new Nodo("c"));
     grafo->agregarNodo(new Nodo("d"));
-    grafo->agregarNodo(new Nodo("e"));
-    grafo->agregarNodo(new Nodo("f"));
     //Agregando Aristas
 
-    grafo->agregarArista("a","b",1);
-    grafo->agregarArista("a","c",8);
-    grafo->agregarArista("c","d",5);
-    grafo->agregarArista("b","d",9);
-    grafo->agregarArista("c","b",6);
-    grafo->agregarArista("c","e",4);
-    grafo->agregarArista("e","f",2);
-    grafo->agregarArista("f","d",3);
-    grafo->agregarArista("e","d",1);
+    grafo->agregarArista("a","b",2);
+    grafo->agregarArista("a","c",22);
+    grafo->agregarArista("c","d",23);
+    grafo->agregarArista("b","d",1);
+
 
     grafo->printAll();
 
