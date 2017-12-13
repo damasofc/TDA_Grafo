@@ -339,19 +339,21 @@ public:
                         for(int s = 0; s < aristas->size(); s++)
                         {
                             Arista* temp = aristas->get(s);
-                            //if(current == temp)
-                               // continue;
+                            if(current == temp)
+                                continue;
                             if(current->peso <= temp->peso)
                             {
                                 aristas->insertar(current,s);
                                 cant++;
                                 insertado = true;
+                                aristas->cantElementos = cant;
                                 break;
                             }
                         }
                         if(!insertado)
                         {
                             aristas->push_back(current);
+                            aristas->cantElementos = cant;
                             cant++;
 
                         }
@@ -396,13 +398,6 @@ public:
             padre[i] = vertices->get(i);
         }
         lista<Arista*>* temp = sortMenorMayor(graf);
-        cout<<"\nARISTAS ORDENADAS:"<<endl;
-        for(int i = 0; i < temp->size(); i++)
-        {
-            Arista* actual = temp->get(i);
-            cout<<"\t\t\tEL camino desde: "<<actual->origen->name<<" hasta: "<<actual->destino->name
-                <<" es de peso: "<<actual->peso<<endl;
-        }
         
         for(int i = 0;i < temp->size();i++)
         {
@@ -437,7 +432,7 @@ public:
         Nodo* origen = NULL;
         for(int i = 0; i < vertices->size(); i++)
         {
-            if(graf->hijosDe(vertices->get(i))->size()>0)
+            if(graf->hijosDe(vertices->get(i))->size() > 0)
             {
                 origen = vertices->get(i);
                 break;
@@ -481,7 +476,12 @@ public:
                     pesos[posAdy] = w;
                 }
                 if(nodoDistMinima(actual,visitado,vertices) == ady && (visitado[posAdy] == 0))
+                {
                     padre[posAdy] = act;
+                    actual = vertices->get(posAdy);
+                    break;
+                }
+                    
                 //FIN RELAJAR
             }
             //comprobar que todos esten visitados
@@ -500,7 +500,7 @@ public:
             }
             else
             {
-                actual = nodoDistMinima(actual,visitado,vertices);
+                //actual = nodoDistMinima(actual,visitado,vertices);
 
             }
         }

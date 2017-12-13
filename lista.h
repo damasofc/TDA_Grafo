@@ -222,6 +222,13 @@ public:
         delete eliminar;
         return eliminado;
     }
+    void swap(T&  x,T& y)
+    {
+         T temp;
+         temp=x;
+         x=y;
+         y=temp;
+    }
     void push_back(T val)
     {
         insertar(val,cantElementos);
